@@ -45,6 +45,29 @@ void setup() {
     disp_drv.draw_buf = &draw_buf;
     lv_disp_drv_register(&disp_drv);
 
+    //ui
+    //rpm gauge
+    lv_obj_t * uiRpmSlider = lv_slider_create(lv_scr_act());
+    lv_obj_set_x(uiRpmSlider, 0);
+    lv_obj_set_y(uiRpmSlider, -100);
+    lv_obj_set_size(uiRpmSlider, 600, 60);
+    lv_slider_set_value(uiRpmSlider, 30, LV_ANIM_OFF);
+
+    //rpm value
+    lv_obj_t * uiRpmValue = lv_label_create(lv_scr_act());
+    lv_obj_set_x(uiRpmValue, 0);
+    lv_obj_set_y(uiRpmValue, -50);
+    
+    //speed value
+    lv_obj_t * uiSpeedValue = lv_label_create(lv_scr_act());
+    lv_obj_set_x(uiSpeedValue, -200);
+    lv_obj_set_y(uiSpeedValue, 0);
+
+    //gear value
+    lv_obj_t * uiGearValue = lv_label_create(lv_scr_act());
+    lv_obj_set_x(uiGearValue, 200);
+    lv_obj_set_y(uiGearValue, 0);
+
 }
 
 void loop() {
