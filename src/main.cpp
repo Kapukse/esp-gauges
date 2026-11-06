@@ -46,28 +46,83 @@ void setup() {
     lv_disp_drv_register(&disp_drv);
 
     //ui
+
+    //change the background color
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_palette_darken(LV_PALETTE_GREY, 3), LV_PART_MAIN);
+
     //rpm gauge
-    lv_obj_t * uiRpmSlider = lv_slider_create(lv_scr_act());
-    lv_obj_set_x(uiRpmSlider, 0);
-    lv_obj_set_y(uiRpmSlider, -100);
-    lv_obj_set_size(uiRpmSlider, 600, 60);
-    lv_slider_set_value(uiRpmSlider, 30, LV_ANIM_OFF);
+    lv_obj_t * uiRpmGauge = lv_slider_create(lv_scr_act());
+    lv_obj_align(uiRpmGauge, LV_ALIGN_CENTER, 0, -100);
+    lv_obj_set_size(uiRpmGauge, 600, 60);
+    lv_slider_set_value(uiRpmGauge, 70, LV_ANIM_ON);
+    lv_slider_set_range(uiRpmGauge, 0, 100);
+
+    //rpm gauge background style    
+    static lv_style_t style_RpmGaugeMain;
+    lv_style_init(&style_RpmGaugeMain);
+    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0x4DED2D));
+    lv_style_set_bg_grad_color(&style_RpmGaugeMain, lv_color_hex(0xFF0000));
+    lv_style_set_bg_grad_dir(&style_RpmGaugeMain, LV_GRAD_DIR_HOR);
+    lv_style_set_bg_main_stop(&style_RpmGaugeMain, 100);
+    lv_style_set_bg_grad_stop(&style_RpmGaugeMain, 225);
+    lv_style_set_border_width(&style_RpmGaugeMain, 2);
+    lv_style_set_border_color(&style_RpmGaugeMain, lv_color_black());
+    lv_obj_add_style(uiRpmGauge, &style_RpmGaugeMain, LV_PART_MAIN);
+
+    //rpm gauge indicator style
+    static lv_style_t style_RpmGaugeInd;
+    lv_style_init(&style_RpmGaugeInd);
+    lv_style_set_bg_color(&style_RpmGaugeInd, lv_color_hex(0x4DED2D));
+    lv_style_set_bg_grad_color(&style_RpmGaugeInd, lv_color_hex(0xFF0000));
+    lv_style_set_bg_grad_dir(&style_RpmGaugeInd, LV_GRAD_DIR_HOR);
+    lv_style_set_bg_main_stop(&style_RpmGaugeInd, 100);
+    lv_style_set_bg_grad_stop(&style_RpmGaugeInd, 225);
+    lv_style_set_border_width(&style_RpmGaugeInd, 2);
+    lv_obj_add_style(uiRpmGauge, &style_RpmGaugeInd, LV_PART_INDICATOR);
+
+    //diable knob in rpm gauge
+    static lv_style_t diableRpmKnob;
+    lv_style_init(&diableRpmKnob);
+    lv_style_set_bg_opa(&diableRpmKnob, 0);
+    lv_obj_add_style(uiRpmGauge, &diableRpmKnob, LV_PART_KNOB);
+
 
     //rpm value
     lv_obj_t * uiRpmValue = lv_label_create(lv_scr_act());
-    lv_obj_set_x(uiRpmValue, 0);
-    lv_obj_set_y(uiRpmValue, -50);
-    
+    lv_obj_align(uiRpmValue, LV_ALIGN_CENTER, 0, -50);
+    lv_label_set_text(uiRpmValue, "1000");
+
+    //rpm value style
+    static lv_style_t style_RpmValue;
+    lv_style_init(&style_RpmValue);
+    lv_style_set_text_font(&style_RpmValue, &lv_font_montserrat_28);
+    lv_style_set_text_color(&style_RpmValue, lv_color_hex(0xEAEAEA));
+    lv_obj_add_style(uiRpmValue, &style_RpmValue, LV_PART_MAIN); 
+
+
     //speed value
     lv_obj_t * uiSpeedValue = lv_label_create(lv_scr_act());
-    lv_obj_set_x(uiSpeedValue, -200);
-    lv_obj_set_y(uiSpeedValue, 0);
+    lv_obj_align(uiSpeedValue, LV_ALIGN_CENTER, -200, 0);
+    lv_label_set_text(uiSpeedValue, "8");
+
+    //speed value style
+    static lv_style_t style_SpeedValue;
+    lv_style_init(&style_SpeedValue);
+    lv_style_set_text_font(&style_SpeedValue, &lv_font_montserrat_48);
+    lv_style_set_text_color(&style_SpeedValue, lv_color_hex(0xEAEAEA));
+    lv_obj_add_style(uiSpeedValue, &style_SpeedValue, LV_PART_MAIN); 
 
     //gear value
     lv_obj_t * uiGearValue = lv_label_create(lv_scr_act());
-    lv_obj_set_x(uiGearValue, 200);
-    lv_obj_set_y(uiGearValue, 0);
+    lv_obj_align(uiGearValue, LV_ALIGN_CENTER, 200, 0);
+    lv_label_set_text(uiGearValue, "N");
 
+    //gear value style
+    static lv_style_t style_GearValue;
+    lv_style_init(&style_GearValue);
+    lv_style_set_text_font(&style_GearValue, &lv_font_montserrat_48);
+    lv_style_set_text_color(&style_GearValue, lv_color_hex(0xEAEAEA));
+    lv_obj_add_style(uiGearValue, &style_GearValue, LV_PART_MAIN); 
 }
 
 void loop() {
