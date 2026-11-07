@@ -34,7 +34,7 @@ void readSimhubData(){
                 int rpmPercent = 0;
                 char gear[8] = "N";
                 int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s", &speed, &rpm, &rpmPercent, gear);
-                if (parsed >= 3) {
+                if (parsed >= 4) {
                     lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
                     lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
                     lv_slider_set_value(uiRpmGauge, rpmPercent, LV_ANIM_OFF);
@@ -103,11 +103,7 @@ void setup() {
     //rpm gauge background style    
     static lv_style_t style_RpmGaugeMain;
     lv_style_init(&style_RpmGaugeMain);
-    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0x4DED2D));
-    lv_style_set_bg_grad_color(&style_RpmGaugeMain, lv_color_hex(0xFF0000));
-    lv_style_set_bg_grad_dir(&style_RpmGaugeMain, LV_GRAD_DIR_HOR);
-    lv_style_set_bg_main_stop(&style_RpmGaugeMain, 100);
-    lv_style_set_bg_grad_stop(&style_RpmGaugeMain, 225);
+    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0x545454));
     lv_style_set_border_width(&style_RpmGaugeMain, 2);
     lv_style_set_border_color(&style_RpmGaugeMain, lv_color_black());
     lv_obj_add_style(uiRpmGauge, &style_RpmGaugeMain, LV_PART_MAIN);
@@ -168,5 +164,5 @@ void setup() {
 void loop() {
     readSimhubData();
     lv_timer_handler();
-    delay(5);
+    delay(10);
 }
