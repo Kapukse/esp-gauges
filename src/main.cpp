@@ -2,9 +2,9 @@
 #include <lvgl.h>
 #include "DisplayConfig.h"
 
-WaveshareDisplay gfx; // from /include/DisplayConfig.h
+WaveshareDisplay gfx;
 
-/* LVGL display flush callback */
+//lvgl display flush callback
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
     uint32_t w = (area->x2 - area->x1 + 1);
     uint32_t h = (area->y2 - area->y1 + 1);
@@ -13,6 +13,45 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
     lv_disp_flush_ready(disp); 
 }
+
+//def
+lv_obj_t * uiRpmGauge = NULL;
+lv_obj_t * uiRpmValue = NULL;
+lv_obj_t * uiSpeedValue = NULL;
+lv_obj_t * uiGearValue = NULL;
+static char rxBuffer[64];
+static size_t rxIndex = 0;
+    
+//read and parse data from simhub
+void readSimhubData(){
+    while (Serial.available() > 0){
+        char a = Serial.read();
+        if (a == '\n' || a == '\r') {
+            if (rxIndex > 0) {
+                rxBuffer[rxIndex] = '\0';
+                int speed = 0;
+                int rpm = 0;
+                int rpmPercent = 0;
+                char gear[8] = "N";
+                int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s", &speed, &rpm, &rpmPercent, gear);
+                if (parsed >= 3) {
+                    lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
+                    lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
+                    lv_slider_set_value(uiRpmGauge, rpmPercent, LV_ANIM_OFF);
+                    lv_label_set_text(uiGearValue, gear);
+                    }
+                rxIndex = 0;
+                }
+            } 
+            else {
+                if (rxIndex < sizeof(rxBuffer) - 1) {
+                    rxBuffer[rxIndex++] = a;
+                } else {
+                    rxIndex = 0;
+                }
+            }
+        }
+    }
 
 void setup() {
     Serial.begin(115200);
@@ -47,11 +86,15 @@ void setup() {
 
     //ui
 
+    lv_obj_t * uiRpmGauge = lv_slider_create(lv_scr_act());
+    lv_obj_t * uiRpmValue = lv_label_create(lv_scr_act());
+    lv_obj_t * uiSpeedValue = lv_label_create(lv_scr_act());
+    lv_obj_t * uiGearValue = lv_label_create(lv_scr_act());
+
     //change the background color
     lv_obj_set_style_bg_color(lv_scr_act(), lv_palette_darken(LV_PALETTE_GREY, 3), LV_PART_MAIN);
 
     //rpm gauge
-    lv_obj_t * uiRpmGauge = lv_slider_create(lv_scr_act());
     lv_obj_align(uiRpmGauge, LV_ALIGN_CENTER, 0, -100);
     lv_obj_set_size(uiRpmGauge, 600, 60);
     lv_slider_set_value(uiRpmGauge, 70, LV_ANIM_ON);
@@ -88,7 +131,6 @@ void setup() {
 
 
     //rpm value
-    lv_obj_t * uiRpmValue = lv_label_create(lv_scr_act());
     lv_obj_align(uiRpmValue, LV_ALIGN_CENTER, 0, -50);
     lv_label_set_text(uiRpmValue, "1000");
 
@@ -101,7 +143,6 @@ void setup() {
 
 
     //speed value
-    lv_obj_t * uiSpeedValue = lv_label_create(lv_scr_act());
     lv_obj_align(uiSpeedValue, LV_ALIGN_CENTER, -200, 0);
     lv_label_set_text(uiSpeedValue, "8");
 
@@ -113,7 +154,6 @@ void setup() {
     lv_obj_add_style(uiSpeedValue, &style_SpeedValue, LV_PART_MAIN); 
 
     //gear value
-    lv_obj_t * uiGearValue = lv_label_create(lv_scr_act());
     lv_obj_align(uiGearValue, LV_ALIGN_CENTER, 200, 0);
     lv_label_set_text(uiGearValue, "N");
 
@@ -126,6 +166,7 @@ void setup() {
 }
 
 void loop() {
+    readSimhubData();
     lv_timer_handler();
     delay(5);
 }

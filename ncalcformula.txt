@@ -1,0 +1,1 @@
+format([SpeedKmh], '0') + ';' + format([Rpms], '0') + ';' + format([RpmsPercent] * 100, '0') + ';' + [Gear] + '\n'
