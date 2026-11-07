@@ -31,15 +31,14 @@ void readSimhubData(){
                 rxBuffer[rxIndex] = '\0';
                 int speed = 0;
                 int rpm = 0;
-                int maxRpm = 0;
+                int rpmPercentage = 0;
                 char gear[8] = "N";
-                int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s", &speed, &rpm, &maxRpm, gear);
+                int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s", &speed, &rpm, &rpmPercentage, gear);
                 if (parsed >= 4) {
                     lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
                     lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
                     lv_label_set_text(uiGearValue, gear);
-                    lv_slider_set_range(uiRpmGauge, 0, maxRpm);
-                    lv_slider_set_value(uiRpmGauge, rpm, LV_ANIM_OFF);
+                    lv_slider_set_value(uiRpmGauge, rpmPercentage, LV_ANIM_OFF);
                     }
                 rxIndex = 0;
                 }
@@ -104,7 +103,7 @@ void setup() {
     //rpm gauge background style    
     static lv_style_t style_RpmGaugeMain;
     lv_style_init(&style_RpmGaugeMain);
-    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0xbbbbbb));
+    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0xcccccc));
     lv_style_set_border_width(&style_RpmGaugeMain, 2);
     lv_style_set_border_color(&style_RpmGaugeMain, lv_color_black());
     lv_obj_add_style(uiRpmGauge, &style_RpmGaugeMain, LV_PART_MAIN);
@@ -113,10 +112,6 @@ void setup() {
     static lv_style_t style_RpmGaugeInd;
     lv_style_init(&style_RpmGaugeInd);
     lv_style_set_bg_color(&style_RpmGaugeInd, lv_color_hex(0x4DED2D));
-    lv_style_set_bg_grad_color(&style_RpmGaugeInd, lv_color_hex(0xFF0000));
-    lv_style_set_bg_grad_dir(&style_RpmGaugeInd, LV_GRAD_DIR_HOR);
-    lv_style_set_bg_main_stop(&style_RpmGaugeInd, 100);
-    lv_style_set_bg_grad_stop(&style_RpmGaugeInd, 225);
     lv_style_set_border_width(&style_RpmGaugeInd, 2);
     lv_obj_add_style(uiRpmGauge, &style_RpmGaugeInd, LV_PART_INDICATOR);
 
@@ -165,5 +160,5 @@ void setup() {
 void loop() {
     readSimhubData();
     lv_timer_handler();
-    delay(10);
+    delay(15);
 }
