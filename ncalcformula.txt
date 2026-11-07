@@ -1,1 +1,0 @@
-format([SpeedKmh], '0') + ';' + format([Rpms], '0') + ';' + format([GameData.CarSettings_CurrentDisplayedRPMPercent] * 100, '0') + ';' + [Gear] + '\n'

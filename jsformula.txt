@@ -1,0 +1,6 @@
+let speed = Math.round($prop('SpeedKmh') || 0);
+let rpm = Math.round($prop('Rpms') || 0);
+let rpmPercent = Math.round(($prop('GameData.CarSettings_CurrentDisplayedRPMPercent') || 0) * 100);
+let gear = $prop('Gear') || 'N';
+
+return `${speed};${rpm};${rpmPercent};${gear}\n`;

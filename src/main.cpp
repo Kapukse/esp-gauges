@@ -66,14 +66,11 @@ void setup() {
 
 
     //framebuffer and memory allocation (wrtitten by ai)
-    const size_t buf_pixels = gfx.width() * 40;
+    const size_t buf_pixels = gfx.width() * 25; 
     static lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(buf_pixels * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
-    if (!buf1) {
-        buf1 = (lv_color_t *)malloc(buf_pixels * sizeof(lv_color_t));
-    }
-
+    static lv_color_t *buf2 = (lv_color_t *)heap_caps_malloc(buf_pixels * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
     static lv_disp_draw_buf_t draw_buf;
-    lv_disp_draw_buf_init(&draw_buf, buf1, NULL, buf_pixels);
+    lv_disp_draw_buf_init(&draw_buf, buf1, buf2, buf_pixels);
 
     //display driver initialization and registration for lvgl
     static lv_disp_drv_t disp_drv;
@@ -97,13 +94,13 @@ void setup() {
     //rpm gauge
     lv_obj_align(uiRpmGauge, LV_ALIGN_CENTER, 0, -100);
     lv_obj_set_size(uiRpmGauge, 600, 60);
-    lv_slider_set_value(uiRpmGauge, 70, LV_ANIM_ON);
+    lv_slider_set_value(uiRpmGauge, 70, LV_ANIM_OFF);
     lv_slider_set_range(uiRpmGauge, 0, 100);
 
     //rpm gauge background style    
     static lv_style_t style_RpmGaugeMain;
     lv_style_init(&style_RpmGaugeMain);
-    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0xcccccc));
+    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0x86b3e3));
     lv_style_set_border_width(&style_RpmGaugeMain, 2);
     lv_style_set_border_color(&style_RpmGaugeMain, lv_color_black());
     lv_obj_add_style(uiRpmGauge, &style_RpmGaugeMain, LV_PART_MAIN);
@@ -111,7 +108,7 @@ void setup() {
     //rpm gauge indicator style
     static lv_style_t style_RpmGaugeInd;
     lv_style_init(&style_RpmGaugeInd);
-    lv_style_set_bg_color(&style_RpmGaugeInd, lv_color_hex(0x4DED2D));
+    lv_style_set_bg_color(&style_RpmGaugeInd, lv_color_hex(0x007afc));
     lv_style_set_border_width(&style_RpmGaugeInd, 2);
     lv_obj_add_style(uiRpmGauge, &style_RpmGaugeInd, LV_PART_INDICATOR);
 
@@ -159,6 +156,9 @@ void setup() {
 
 void loop() {
     readSimhubData();
-    lv_timer_handler();
-    delay(15);
+    static uint32_t lastUpdate = 0;
+  	if (millis() - lastUpdate >= 16) {
+	   lastUpdate = millis();
+            lv_timer_handler();
+  	}
 }
