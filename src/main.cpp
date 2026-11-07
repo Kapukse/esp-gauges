@@ -86,10 +86,10 @@ void setup() {
 
     //ui
 
-    lv_obj_t * uiRpmGauge = lv_slider_create(lv_scr_act());
-    lv_obj_t * uiRpmValue = lv_label_create(lv_scr_act());
-    lv_obj_t * uiSpeedValue = lv_label_create(lv_scr_act());
-    lv_obj_t * uiGearValue = lv_label_create(lv_scr_act());
+    uiRpmGauge = lv_slider_create(lv_scr_act());
+    uiRpmValue = lv_label_create(lv_scr_act());
+    uiSpeedValue = lv_label_create(lv_scr_act());
+    uiGearValue = lv_label_create(lv_scr_act());
 
     //change the background color
     lv_obj_set_style_bg_color(lv_scr_act(), lv_palette_darken(LV_PALETTE_GREY, 3), LV_PART_MAIN);
