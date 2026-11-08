@@ -15,10 +15,10 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 }
 
 //def
-lv_obj_t * uiRpmGauge = NULL;
 lv_obj_t * uiRpmValue = NULL;
 lv_obj_t * uiSpeedValue = NULL;
 lv_obj_t * uiGearValue = NULL;
+lv_obj_t * uiRpmLed[10];
 static char rxBuffer[64];
 static size_t rxIndex = 0;
     
@@ -32,17 +32,39 @@ void readSimhubData(){
                 int speed = 0;
                 int rpm = 0;
                 int rpmPercentage = 0;
+
                 char gear[8] = "N";
                 int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s", &speed, &rpm, &rpmPercentage, gear);
-                if (parsed >= 4) {
-                    lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
-                    lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
-                    lv_label_set_text(uiGearValue, gear);
-                    lv_slider_set_value(uiRpmGauge, rpmPercentage, LV_ANIM_OFF);
-                    }
-                rxIndex = 0;
+                lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
+                lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
+                lv_label_set_text(uiGearValue, gear);
+                
+                int numLedsOn = 0;
+                if (rpmPercentage >= 10) {
+                    numLedsOn = rpmPercentage - 10;
                 }
-            } 
+                if (numLedsOn > 10) numLedsOn = 10;
+
+                for (int i = 0; i < 10; i++) {
+                    if (i < numLedsOn) {
+                        if (i < 4) {
+                            lv_obj_set_style_bg_color(uiRpmLed[i], lv_color_hex(0x56fc03), LV_PART_MAIN);
+                        }
+                        else if (i < 7) {
+                            lv_obj_set_style_bg_color(uiRpmLed[i], lv_color_hex(0xfcf403), LV_PART_MAIN);
+                        }
+                        else {
+                            lv_obj_set_style_bg_color(uiRpmLed[i], lv_color_hex(0xfc0b03), LV_PART_MAIN);
+                        }
+                    }
+                    else {
+                        lv_obj_set_style_bg_color(uiRpmLed[i], lv_color_hex(0x687d9e), LV_PART_MAIN);
+                    }
+                }
+            
+                rxIndex = 0;
+            }
+        } 
             else {
                 if (rxIndex < sizeof(rxBuffer) - 1) {
                     rxBuffer[rxIndex++] = a;
@@ -83,43 +105,23 @@ void setup() {
 
     //ui
 
-    uiRpmGauge = lv_slider_create(lv_scr_act());
-    uiRpmValue = lv_label_create(lv_scr_act());
-    uiSpeedValue = lv_label_create(lv_scr_act());
-    uiGearValue = lv_label_create(lv_scr_act());
-
     //change the background color
-    lv_obj_set_style_bg_color(lv_scr_act(), lv_palette_darken(LV_PALETTE_GREY, 3), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), LV_PART_MAIN);
 
-    //rpm gauge
-    lv_obj_align(uiRpmGauge, LV_ALIGN_CENTER, 0, -100);
-    lv_obj_set_size(uiRpmGauge, 600, 60);
-    lv_slider_set_value(uiRpmGauge, 70, LV_ANIM_OFF);
-    lv_slider_set_range(uiRpmGauge, 0, 100);
-
-    //rpm gauge background style    
-    static lv_style_t style_RpmGaugeMain;
-    lv_style_init(&style_RpmGaugeMain);
-    lv_style_set_bg_color(&style_RpmGaugeMain, lv_color_hex(0x86b3e3));
-    lv_style_set_border_width(&style_RpmGaugeMain, 2);
-    lv_style_set_border_color(&style_RpmGaugeMain, lv_color_black());
-    lv_obj_add_style(uiRpmGauge, &style_RpmGaugeMain, LV_PART_MAIN);
-
-    //rpm gauge indicator style
-    static lv_style_t style_RpmGaugeInd;
-    lv_style_init(&style_RpmGaugeInd);
-    lv_style_set_bg_color(&style_RpmGaugeInd, lv_color_hex(0x007afc));
-    lv_style_set_border_width(&style_RpmGaugeInd, 2);
-    lv_obj_add_style(uiRpmGauge, &style_RpmGaugeInd, LV_PART_INDICATOR);
-
-    //diable knob in rpm gauge
-    static lv_style_t diableRpmKnob;
-    lv_style_init(&diableRpmKnob);
-    lv_style_set_bg_opa(&diableRpmKnob, 0);
-    lv_obj_add_style(uiRpmGauge, &diableRpmKnob, LV_PART_KNOB);
+    //drawing rpm gauge
+    for (int i = 0; i < 10; i++){
+        uiRpmLed[i] = lv_obj_create(lv_scr_act()); 
+        lv_obj_remove_style_all(uiRpmLed[i]);    
+        lv_obj_set_size(uiRpmLed[i], 40, 40);
+        lv_obj_align(uiRpmLed[i], LV_ALIGN_CENTER, -225 + i * (40 + 10), -120);
+        lv_obj_set_style_bg_color(uiRpmLed[i], lv_color_hex(0x687d9e), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(uiRpmLed[i], LV_OPA_COVER, LV_PART_MAIN);
+        lv_obj_set_style_radius(uiRpmLed[i], LV_RADIUS_CIRCLE, LV_PART_MAIN);        
+    }
 
 
     //rpm value
+    uiRpmValue = lv_label_create(lv_scr_act());
     lv_obj_align(uiRpmValue, LV_ALIGN_CENTER, 0, -50);
     lv_label_set_text(uiRpmValue, "1000");
 
@@ -132,6 +134,7 @@ void setup() {
 
 
     //speed value
+    uiSpeedValue = lv_label_create(lv_scr_act());
     lv_obj_align(uiSpeedValue, LV_ALIGN_CENTER, -200, 0);
     lv_label_set_text(uiSpeedValue, "8");
 
@@ -142,7 +145,9 @@ void setup() {
     lv_style_set_text_color(&style_SpeedValue, lv_color_hex(0xEAEAEA));
     lv_obj_add_style(uiSpeedValue, &style_SpeedValue, LV_PART_MAIN); 
 
+
     //gear value
+    uiGearValue = lv_label_create(lv_scr_act());
     lv_obj_align(uiGearValue, LV_ALIGN_CENTER, 200, 0);
     lv_label_set_text(uiGearValue, "N");
 
