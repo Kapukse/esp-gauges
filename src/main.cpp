@@ -36,8 +36,8 @@ void readSimhubData(){
                 int rpmPercentage = 0;
                 char gear[8] = "N";
                 int abs = 0;
-                char lap[16] = "00.00.00.00";
-                int parsed = sscanf(rxBuffer, "%d;%d;%d;%d;%15[^;];%7s", &speed, &rpm, &rpmPercentage, &abs, lap, gear);
+                char lap[16] = "00.00.0";
+                int parsed = sscanf(rxBuffer, "%d;%d;%d;%d;%[^;];%s", &speed, &rpm, &rpmPercentage, &abs, lap, gear);
                 lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
                 lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
                 lv_label_set_text(uiGearValue, gear);
