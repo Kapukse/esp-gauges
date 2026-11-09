@@ -36,12 +36,15 @@ void readSimhubData(){
                 int rpmPercentage = 0;
                 char gear[8] = "N";
                 int abs = 0;
-                float lap = 0.0;
-                int parsed = sscanf(rxBuffer, "%d;%d;%d;%d;%f;%7s", &speed, &rpm, &rpmPercentage, &abs, &lap, gear);
+                int lap = 0;
+                int parsed = sscanf(rxBuffer, "%d;%d;%d;%d;%d;%7s", &speed, &rpm, &rpmPercentage, &abs, &lap, gear);
                 lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
                 lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
                 lv_label_set_text(uiGearValue, gear);
-                lv_label_set_text_fmt(uiLapTime, "%.2f", lap);
+                int lapMins = lap / 60;
+                int lapSecs = lap % 60;
+                lv_label_set_text_fmt(uiLapTime, "%d;%02d", lapMins, lapSecs);
+
                 if(abs == 1){
                     lv_obj_set_style_text_color(uIAbsSt, lv_color_hex(0xfc0b03), LV_PART_MAIN);
                 }else{
