@@ -19,6 +19,8 @@ lv_obj_t * uiRpmValue = NULL;
 lv_obj_t * uiSpeedValue = NULL;
 lv_obj_t * uiGearValue = NULL;
 lv_obj_t * uiRpmLed[10];
+lv_obj_t * uIAbsSt = NULL;
+lv_obj_t * uiLapTime = NULL;
 static char rxBuffer[64];
 static size_t rxIndex = 0;
     
@@ -32,15 +34,20 @@ void readSimhubData(){
                 int speed = 0;
                 int rpm = 0;
                 int rpmPercentage = 0;
-
                 char gear[8] = "N";
-                int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s", &speed, &rpm, &rpmPercentage, gear);
+                int abs = 0;
+                int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s;%d", &speed, &rpm, &rpmPercentage, gear, &abs);
                 lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
                 lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
                 lv_label_set_text(uiGearValue, gear);
+                if(abs == 1){
+                    lv_obj_set_style_text_color(uIAbsSt, lv_color_hex(0xfc0b03), LV_PART_MAIN);
+                }else{
+                    lv_obj_set_style_text_color(uIAbsSt, lv_color_hex(0x687d9e), LV_PART_MAIN);                   
+                }
                 
                 int numLedsOn = 0;
-                if (rpmPercentage >= 10) {
+                if(rpmPercentage >= 10){
                     numLedsOn = rpmPercentage - 10;
                 }
                 if (numLedsOn > 10) numLedsOn = 10;
@@ -86,9 +93,8 @@ void setup() {
     //lvgl init
     lv_init();
 
-
     //framebuffer and memory allocation (wrtitten by ai)
-    const size_t buf_pixels = gfx.width() * 25; 
+    const size_t buf_pixels = gfx.width() * 45; 
     static lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(buf_pixels * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
     static lv_color_t *buf2 = (lv_color_t *)heap_caps_malloc(buf_pixels * sizeof(lv_color_t), MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
     static lv_disp_draw_buf_t draw_buf;
@@ -157,7 +163,14 @@ void setup() {
     lv_style_set_text_font(&style_GearValue, &lv_font_montserrat_48);
     lv_style_set_text_color(&style_GearValue, lv_color_hex(0xEAEAEA));
     lv_obj_add_style(uiGearValue, &style_GearValue, LV_PART_MAIN); 
-}
+
+    //abs status
+    uIAbsSt = lv_label_create(lv_scr_act());
+    lv_obj_align(uIAbsSt, LV_ALIGN_CENTER, 320, 110);
+    lv_label_set_text(uIAbsSt, "abs");
+    lv_obj_set_style_text_color(uIAbsSt, lv_color_hex(0x687d9e), LV_PART_MAIN);
+
+} 
 
 void loop() {
     readSimhubData();
