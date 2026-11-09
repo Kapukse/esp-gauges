@@ -36,10 +36,12 @@ void readSimhubData(){
                 int rpmPercentage = 0;
                 char gear[8] = "N";
                 int abs = 0;
-                int parsed = sscanf(rxBuffer, "%d;%d;%d;%7s;%d", &speed, &rpm, &rpmPercentage, gear, &abs);
+                float lap = 0.0;
+                int parsed = sscanf(rxBuffer, "%d;%d;%d;%d;%f;%7s", &speed, &rpm, &rpmPercentage, &abs, &lap, gear);
                 lv_label_set_text_fmt(uiSpeedValue, "%d", speed);
                 lv_label_set_text_fmt(uiRpmValue, "%d", rpm);
                 lv_label_set_text(uiGearValue, gear);
+                lv_label_set_text_fmt(uiLapTime, "%.2f", lap);
                 if(abs == 1){
                     lv_obj_set_style_text_color(uIAbsSt, lv_color_hex(0xfc0b03), LV_PART_MAIN);
                 }else{
@@ -47,8 +49,8 @@ void readSimhubData(){
                 }
                 
                 int numLedsOn = 0;
-                if(rpmPercentage >= 10){
-                    numLedsOn = rpmPercentage - 10;
+                if(rpmPercentage >= 20){
+                    numLedsOn = rpmPercentage - 20;
                 }
                 if (numLedsOn > 10) numLedsOn = 10;
 
@@ -170,6 +172,12 @@ void setup() {
     lv_label_set_text(uIAbsSt, "abs");
     lv_obj_set_style_text_color(uIAbsSt, lv_color_hex(0x687d9e), LV_PART_MAIN);
 
+    //lap time
+    uiLapTime = lv_label_create(lv_scr_act());
+    lv_obj_align(uiLapTime, LV_ALIGN_CENTER, -320, 110);
+    lv_label_set_text(uiLapTime, "0.00");
+    lv_obj_set_style_text_color(uiLapTime, lv_color_hex(0xEAEAEA), LV_PART_MAIN);
+    lv_obj_set_style_text_font(uiLapTime, &lv_font_montserrat_20, LV_PART_MAIN);
 } 
 
 void loop() {
